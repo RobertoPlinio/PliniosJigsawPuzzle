@@ -15,7 +15,7 @@ namespace JigsawPuzzle
         [Range(0.1f, 1)] public float debug_pieceSize = 1f;
         int TotalPieces => debug_height * debug_width;
 
-        HashSet<GridSlot> slots = new HashSet<GridSlot>();
+        public HashSet<GridSlot> slots = new HashSet<GridSlot>();
         bool isGridGenerated = false;
 
         private void OnValidate() {
@@ -29,6 +29,14 @@ namespace JigsawPuzzle
             }
         }
 
+        public void Init() {
+            Init(debug_width, debug_height, debug_pieceSize);
+        }
+
+        public void Init(int width, int height, float pieceSize = 1f) {
+            GenerateGridSlots(width, height, pieceSize);
+        }
+
         void GenerateGridSlots(int width, int height, float pieceSize) {
             int rows = 0;
 
@@ -36,7 +44,7 @@ namespace JigsawPuzzle
                 Vector3 gridPos = transform.TransformPoint(transform.right * pieceSize * 0.5f - transform.up * pieceSize * 0.5f - transform.up * rows * pieceSize);
 
                 for (int i = 0; i < width; i++) {
-                    slots.Add(new GridSlot(gridPos));
+                    slots.Add(new GridSlot(gridPos, new Vector2(i, rows)));
                     gridPos += transform.right * pieceSize;
                 }
                 rows++;
@@ -82,11 +90,13 @@ namespace JigsawPuzzle
         public struct GridSlot
         {
             public Vector3 position;
+            public Vector2 id;
             public bool isAvailable;
 
-            public GridSlot(Vector3 bornPosition) {
+            public GridSlot(Vector3 bornPosition, Vector2 _id) {
                 isAvailable = true;
                 position = bornPosition;
+                id = _id + Vector2.one;
             }
         }
     }
