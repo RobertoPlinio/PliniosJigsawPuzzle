@@ -6,6 +6,6 @@ namespace JigsawPuzzle
 {
     public class Piece : MonoBehaviour
     {
-
+        public bool IsCorner;
     }
 }

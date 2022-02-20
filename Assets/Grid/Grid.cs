@@ -13,7 +13,7 @@ namespace JigsawPuzzle
         public bool showDebug = false;
         [Range(2, 50)] public int debug_width, debug_height;
         [Range(0.1f, 1)] public float debug_pieceSize = 1f;
-        int TotalPieces => debug_height * debug_width;
+        int debig_totalPieces => debug_height * debug_width;
 
         public HashSet<GridSlot> slots = new HashSet<GridSlot>();
         bool isGridGenerated = false;
@@ -69,12 +69,12 @@ namespace JigsawPuzzle
                 Color endColor = Color.blue;
                 int rows = 0;
 
-                Handles.Label(transform.TransformPoint(transform.up * 0.5f), $"Total: {TotalPieces}");
+                Handles.Label(transform.TransformPoint(transform.up * 0.5f), $"Total: {debig_totalPieces}");
 
                 while (rows < debug_height) {
                     Vector3 gridPos = transform.TransformPoint(transform.right * debug_pieceSize * 0.5f - transform.up * debug_pieceSize * 0.5f - transform.up * rows * debug_pieceSize);
                     for (int i = 0; i < debug_width; i++) {
-                        Gizmos.DrawIcon(gridPos, "Icon_JigsawPiece", true, Color.Lerp(startColor, endColor, ((float)i * (rows + 1)) / TotalPieces));
+                        Gizmos.DrawIcon(gridPos, "Icon_JigsawPiece", true, Color.Lerp(startColor, endColor, ((float)i * (rows + 1)) / debig_totalPieces));
                         gridPos += transform.right * debug_pieceSize;
                     }
                     rows++;
