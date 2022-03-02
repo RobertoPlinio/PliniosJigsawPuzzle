@@ -1,11 +1,15 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace JigsawPuzzle
 {
     public class Piece : MonoBehaviour
     {
+        const string pieceResourcesPath = "Piece/Pieces";
+        const string piecePresetResourcesPath = "Piece/Presets";
         public enum Side
         {
             Edge,
@@ -13,24 +17,65 @@ namespace JigsawPuzzle
             Hole
         }
 
+        public Side left;
+        public Side up;
+        public Side right;
+        public Side bottom;
+
         public bool IsCorner;
-        public PieceInfo info;
 
-        [ContextMenu("Debug Init")]
-        void DebugInit() => Init(info);
+        private string pieceName {
+            get { return string.Concat(left.ToString()[0], up.ToString()[0], right.ToString()[0], bottom.ToString()[0]); }
+            set { }
+        }
 
-        public void Init(PieceInfo _info) {
-            info = _info;
+        public void Init() {
+            UpdatePiece();
+        }
 
-            IsCorner = info.right == Side.Edge || info.left == Side.Edge
-                || info.bottom == Side.Edge || info.up == Side.Edge;
+        [ContextMenu("Update Piece")]
+        public void UpdatePiece() {
+            bool isNotAPrefab = PrefabUtility.GetPrefabInstanceStatus(this) == PrefabInstanceStatus.NotAPrefab;
 
-            GetComponent<MeshFilter>().mesh = info.equivalentMesh;
+            if (isNotAPrefab && !Application.isPlaying) {
 
-            MeshRenderer mr = GetComponent<MeshRenderer>();
-            if(mr.materials.Length < 2) {
-                Material[] mats = new Material[] { mr.material, mr.material };
-                mr.materials = mats;
+                UnityEngine.Object[] objs = Selection.GetFiltered(typeof(GameObject), SelectionMode.DeepAssets);
+
+                foreach (GameObject o in objs) {
+                    MeshFilter mf = o.GetComponent<MeshFilter>();
+                    if (mf.sharedMesh.name != o.name) {
+                        mf.sharedMesh = (Mesh)AssetFinder.GetObjectFromAll(pieceResourcesPath, pieceName, typeof(Mesh));
+
+                        string assetPath = AssetDatabase.GetAssetPath(this);
+                        if (!string.IsNullOrWhiteSpace(assetPath)) {
+                            string result = AssetDatabase.RenameAsset(assetPath, $"Piece_{pieceName}");
+                            Debug.Log(result + "/ " + mf.sharedMesh.name + " " + o.name + " " + AssetDatabase.GetAssetPath(this));
+                            AssetDatabase.Refresh();
+                        }
+                    }
+
+                }
+            } else {
+
+                MeshFilter mf = GetComponent<MeshFilter>();
+                try {
+                    if (Application.isPlaying) {
+                        if (mf.mesh.name != name) {
+                            mf.mesh = (Mesh)AssetFinder.GetObjectFromAll(pieceResourcesPath, pieceName, typeof(Mesh));
+                        }
+                    } else {
+                        if (mf.sharedMesh.name != name) {
+                            mf.sharedMesh = (Mesh)AssetFinder.GetObjectFromAll(pieceResourcesPath, pieceName, typeof(Mesh));
+                        }
+                    }
+                } catch (Exception e) {
+                    Debug.Log($"[PIECE] Error: {e.Message}", gameObject);
+                }
+
+                name = "Piece_" + pieceName;
+
+                IsCorner = right == Side.Edge || left == Side.Edge
+                    || bottom == Side.Edge || up == Side.Edge;
             }
         }
     }
