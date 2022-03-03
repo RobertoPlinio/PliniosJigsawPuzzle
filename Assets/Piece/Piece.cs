@@ -37,23 +37,30 @@ namespace JigsawPuzzle
         public void UpdatePiece() {
             bool isNotAPrefab = PrefabUtility.GetPrefabInstanceStatus(this) == PrefabInstanceStatus.NotAPrefab;
 
+            IsCorner = right == Side.Edge || left == Side.Edge
+                    || bottom == Side.Edge || up == Side.Edge;
+
             if (isNotAPrefab && !Application.isPlaying) {
 
                 UnityEngine.Object[] objs = Selection.GetFiltered(typeof(GameObject), SelectionMode.DeepAssets);
 
                 foreach (GameObject o in objs) {
                     MeshFilter mf = o.GetComponent<MeshFilter>();
-                    if (mf.sharedMesh.name != o.name) {
+                    if (!mf.sharedMesh || mf.sharedMesh.name != o.name) {
                         mf.sharedMesh = (Mesh)AssetFinder.GetObjectFromAll(pieceResourcesPath, pieceName, typeof(Mesh));
 
+                        Debug.Log(mf.sharedMesh.name);
                         string assetPath = AssetDatabase.GetAssetPath(this);
                         if (!string.IsNullOrWhiteSpace(assetPath)) {
                             string result = AssetDatabase.RenameAsset(assetPath, $"Piece_{pieceName}");
-                            Debug.Log(result + "/ " + mf.sharedMesh.name + " " + o.name + " " + AssetDatabase.GetAssetPath(this));
-                            AssetDatabase.Refresh();
+                            if (!string.IsNullOrWhiteSpace(result))
+                                Debug.Log(result);
+
                         }
                     }
 
+                    EditorUtility.SetDirty(this);
+                    AssetDatabase.Refresh();
                 }
             } else {
 
@@ -73,9 +80,6 @@ namespace JigsawPuzzle
                 }
 
                 name = "Piece_" + pieceName;
-
-                IsCorner = right == Side.Edge || left == Side.Edge
-                    || bottom == Side.Edge || up == Side.Edge;
             }
         }
     }
