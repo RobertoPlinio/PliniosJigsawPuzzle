@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,38 +12,85 @@ namespace JigsawPuzzle
         public bool showDebug = false;
         [Range(2, 50)] public int debug_width, debug_height;
         [Range(0.1f, 1)] public float debug_pieceSize = 1f;
-        int debig_totalPieces => debug_height * debug_width;
+        public Material[] matArray1, matArray2;
+        int debug_totalPieces => debug_height * debug_width;
 
-        public HashSet<GridSlot> slots = new HashSet<GridSlot>();
+        public GridSlot[,] slots;
         bool isGridGenerated = false;
 
         private void OnValidate() {
             if (showDebug) DebugCalculateTotalPieces();
         }
 
-        private void Start() {
+        private void Awake() {
             if (showDebug) {
                 CalculateTotalPieces(debug_width, debug_height);
                 GenerateGridSlots(debug_width, debug_height, debug_pieceSize);
             }
         }
 
-        public void Init() {
-            Init(debug_width, debug_height, debug_pieceSize);
-        }
-
         public void Init(int width, int height, float pieceSize = 1f) {
             GenerateGridSlots(width, height, pieceSize);
         }
 
+        public HashSet<Piece> GeneratePieces(PuzzleManager manager) {
+            HashSet<Piece> createdPieces = new HashSet<Piece>();
+            int rows = slots.GetLength(0);
+            int cols = slots.GetLength(1);
+
+            Object[] prefabs = Resources.LoadAll("Piece/Presets");
+                Material[] mats = matArray1;
+
+            for (int c = 0; c < cols; c++) {
+                for (int r = 0; r < rows; r++) {
+                    string name = CreatePieceName(r, c);
+                    Debug.Log($"Piece name is {name}");
+                    GameObject piece = Instantiate(prefabs.First(x => x.name.Contains(name)) as GameObject, slots[r, c].position, Quaternion.identity);
+                    Piece pieceComponent = piece.GetComponent<Piece>();
+                    piece.GetComponent<MeshRenderer>().materials = mats; //Just temp fun visualization
+                    mats = mats == matArray2 ? matArray1 : matArray2;
+                    createdPieces.Add(pieceComponent);
+                    slots[r, c].AssignPiece(pieceComponent);
+                }
+                mats = mats == matArray2 ? matArray1 : matArray2;
+            }
+
+            return createdPieces;
+
+            string CreatePieceName(int x, int y) {
+                char left = x < 1 ? 'E' : SolvePieceSide(slots[x - 1, y].GetPiece().right);
+                char up = y < 1 ? 'E' : SolvePieceSide(slots[x, y - 1].GetPiece().bottom);
+                char right = x >= rows - 1 ? 'E' : CreateRandomSide();
+                char bottom = y >= cols - 1 ? 'E' : CreateRandomSide();
+
+                return string.Concat(left, up, right, bottom);
+            }
+
+            char SolvePieceSide(Piece.Side previousPieceSlot) {
+                switch (previousPieceSlot) {
+                    case Piece.Side.Hole: return 'T';
+                    case Piece.Side.Tab: return 'H';
+                    default:
+                        Debug.LogError("[GRID] Left piece has no valid side");
+                        return default;
+                }
+
+            }
+
+            char CreateRandomSide() {
+                int result = Mathf.RoundToInt(Random.value);
+                return result % 2 == 0 ? 'T' : 'H';
+            }
+        }
+
         void GenerateGridSlots(int width, int height, float pieceSize) {
             int rows = 0;
-
+            slots = new GridSlot[width, height];
             while (rows < height) {
-                Vector3 gridPos = transform.TransformPoint(transform.right * pieceSize * 0.5f - transform.up * pieceSize * 0.5f - transform.up * rows * pieceSize);
+                Vector3 gridPos = transform.TransformPoint(-transform.up * rows * pieceSize);
 
                 for (int i = 0; i < width; i++) {
-                    slots.Add(new GridSlot(gridPos, new Vector2(i, rows)));
+                    slots[i, rows] = new GridSlot(gridPos, new Vector2(i, rows));
                     gridPos += transform.right * pieceSize;
                 }
                 rows++;
@@ -69,19 +115,15 @@ namespace JigsawPuzzle
                 Color endColor = Color.blue;
                 int rows = 0;
 
-                Handles.Label(transform.TransformPoint(transform.up * 0.5f), $"Total: {debig_totalPieces}");
+                Handles.Label(transform.TransformPoint(transform.up * 0.5f), $"Total: {debug_totalPieces}");
 
                 while (rows < debug_height) {
-                    Vector3 gridPos = transform.TransformPoint(transform.right * debug_pieceSize * 0.5f - transform.up * debug_pieceSize * 0.5f - transform.up * rows * debug_pieceSize);
+                    Vector3 gridPos = transform.TransformPoint(-transform.up * rows * debug_pieceSize);
                     for (int i = 0; i < debug_width; i++) {
-                        Gizmos.DrawIcon(gridPos, "Icon_JigsawPiece", true, Color.Lerp(startColor, endColor, ((float)i * (rows + 1)) / debig_totalPieces));
+                        Gizmos.DrawIcon(gridPos, "Icon_JigsawPiece", true, Color.Lerp(startColor, endColor, ((float)i * (rows + 1)) / debug_totalPieces));
                         gridPos += transform.right * debug_pieceSize;
                     }
                     rows++;
-                }
-            } else {
-                foreach (GridSlot item in slots) {
-                    Gizmos.DrawIcon(item.position, "Icon_JigsawPiece", true, Color.yellow);
                 }
             }
         }
@@ -92,12 +134,20 @@ namespace JigsawPuzzle
             public Vector3 position;
             public Vector2 id;
             public bool isAvailable;
+            Piece assignedPiece;
 
             public GridSlot(Vector3 bornPosition, Vector2 _id) {
                 isAvailable = true;
                 position = bornPosition;
                 id = _id + Vector2.one;
+                assignedPiece = null;
             }
+
+            public void AssignPiece(Piece _piece) {
+                assignedPiece = _piece;
+            }
+
+            public Piece GetPiece() => assignedPiece;
         }
     }
 }

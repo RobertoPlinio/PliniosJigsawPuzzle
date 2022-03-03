@@ -217,6 +217,12 @@ MonoBehaviour:
   debug_width: 8
   debug_height: 5
   debug_pieceSize: 1
+  matArray1:
+  - {fileID: -876546973899608171, guid: 968b84b85eeb1f34bbef3794b41374d8, type: 3}
+  - {fileID: 1673722310792516149, guid: 968b84b85eeb1f34bbef3794b41374d8, type: 3}
+  matArray2:
+  - {fileID: 1673722310792516149, guid: 968b84b85eeb1f34bbef3794b41374d8, type: 3}
+  - {fileID: -876546973899608171, guid: 968b84b85eeb1f34bbef3794b41374d8, type: 3}
 --- !u!1 &611907081
 GameObject:
   m_ObjectHideFlags: 0
