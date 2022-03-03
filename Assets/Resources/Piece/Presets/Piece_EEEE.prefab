@@ -50,7 +50,7 @@ MonoBehaviour:
   up: 0
   right: 0
   bottom: 0
-  IsCorner: 0
+  IsCorner: 1
 --- !u!33 &6518609205834938866
 MeshFilter:
   m_ObjectHideFlags: 0

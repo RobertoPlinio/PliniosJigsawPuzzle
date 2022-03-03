@@ -66,12 +66,12 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: -7915470408941815772, guid: 968b84b85eeb1f34bbef3794b41374d8,
+      objectReference: {fileID: -5342310766669729173, guid: 968b84b85eeb1f34bbef3794b41374d8,
         type: 3}
     - target: {fileID: 7490763348998365026, guid: 4eb4e752068202f4e89a0529435c321b,
         type: 3}
       propertyPath: m_Name
-      value: Piece_EHTE
+      value: Piece_HHET
       objectReference: {fileID: 0}
     - target: {fileID: 7490763348998365052, guid: 4eb4e752068202f4e89a0529435c321b,
         type: 3}
@@ -80,13 +80,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7490763348998365052, guid: 4eb4e752068202f4e89a0529435c321b,
         type: 3}
+      propertyPath: left
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7490763348998365052, guid: 4eb4e752068202f4e89a0529435c321b,
+        type: 3}
       propertyPath: right
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7490763348998365052, guid: 4eb4e752068202f4e89a0529435c321b,
         type: 3}
       propertyPath: bottom
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7490763348998365052, guid: 4eb4e752068202f4e89a0529435c321b,
         type: 3}
