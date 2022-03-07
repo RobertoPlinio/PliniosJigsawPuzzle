@@ -49,7 +49,6 @@ namespace JigsawPuzzle
                     if (!mf.sharedMesh || mf.sharedMesh.name != o.name) {
                         mf.sharedMesh = (Mesh)AssetFinder.GetObjectFromAll(pieceResourcesPath, pieceName, typeof(Mesh));
 
-                        Debug.Log(mf.sharedMesh.name);
                         string assetPath = AssetDatabase.GetAssetPath(this);
                         if (!string.IsNullOrWhiteSpace(assetPath)) {
                             string result = AssetDatabase.RenameAsset(assetPath, $"Piece_{pieceName}");

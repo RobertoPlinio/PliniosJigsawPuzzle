@@ -7,13 +7,13 @@ namespace JigsawPuzzle
     public class PuzzleManager : MonoBehaviour
     {
         public Grid grid;
-        public ImageSlicer imgSlicer;
+        public ImageHandler imgSlicer;
 
         HashSet<Piece> piecesInPlay = new HashSet<Piece>();
 
         private void Awake() {
             grid = GetComponentInChildren<Grid>();
-            imgSlicer = GetComponentInChildren<ImageSlicer>();
+            imgSlicer = GetComponentInChildren<ImageHandler>();
         }
 
         private void Start() {
