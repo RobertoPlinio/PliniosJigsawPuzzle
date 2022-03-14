@@ -33,7 +33,7 @@ namespace JigsawPuzzle
             float iRatio = (float)image.width / image.height;
 
             print($"Ratio of pieces is {xAmount / pDiv}:{yAmount / pDiv} or {pRatio}");
-            print($"Ration of image is {image.width / iDiv}:{image.height / iDiv} or {iRatio}");
+            print($"Ratio of image is {image.width / iDiv}:{image.height / iDiv} or {iRatio}");
 
             bool equalAxis = Mathf.Approximately(pRatio, iRatio);
             bool xIsBigger = xAmount > yAmount;
@@ -44,24 +44,26 @@ namespace JigsawPuzzle
                 if (xIsBigger) {
                     if (debug_fillImage) {
                         fillW = (int)(image.width * pRatio);
-                        print($"Image needs filling on horizontal by {(fillW - image.width) / 2} each side");
+                        print($"[x] Image needs filling on horizontal by {(fillW - image.width) / 2} each side");
                     } else {
                         pRatio = (float)yAmount / xAmount;
                         fillH = (int)(image.height * pRatio);
-                        print($"Image will be cropped on vertical by {(image.width - fillH) / 2} each side");
+                        print($"[x] Image will be cropped on vertical by {(image.width - fillH) / 2} each side");
                     }
                 } else {
                     if (debug_fillImage) {
                         pRatio = (float)yAmount / xAmount;
                         fillH = (int)(image.height * pRatio);
-                        print($"Image needs filling on vertical by {(fillH - image.height) / 2} each side");
+                        print($"[y] Image needs filling on vertical by {(fillH - image.height) / 2} each side");
                     } else {
                         fillW = (int)(image.width * pRatio);
-                        print($"Image will be cropped on horizontal by {(image.width - fillW) / 2} each side");
+                        print($"[y] Image will be cropped on horizontal by {(image.width - fillW) / 2} each side");
                     }
                 }
 
-                print($"Image size will be: {fillW},{fillH}");
+                int fiDiv = GetGCD(fillW, fillH);
+                float fiRatio = (float)fillW / fillH;
+                print($"Image size will be: {fillW},{fillH} with ratio {fillW / fiDiv}:{fillH / fiDiv} or {fiRatio}");
                 finalImage = fillImg ? FillImage(image, fillW, fillH, xIsBigger) : CropImage(image, fillW, fillH, !xIsBigger);
 
                 if (debug_createNewImgAsset) {
@@ -80,32 +82,37 @@ namespace JigsawPuzzle
             return finalImage;
         }
 
-        public Texture2D[] SliceImage(Texture2D img) => SliceImage(img, pieceXsize, pieceYsize);
+        public Texture2D[] SliceImage(Texture2D img, float uvOffset = 0f) => SliceImage(img, pieceXsize, pieceYsize, uvOffset);
 
-        public Texture2D[] SliceImage(Texture2D img, int blockXSize, int blockYSize) {
-            Color[] fillDefault = new Color[blockXSize * blockYSize];
-            for (int i = 0; i < fillDefault.Length; i++) fillDefault[i] = Color.black;
+        public Texture2D[] SliceImage(Texture2D img, int blockXSize, int blockYSize, float uvOffset = 0f) {
+            int bxOffset = (int)(blockXSize * uvOffset);
+            int byOffset = (int)(blockYSize * uvOffset);
+
+            Texture2D tempImg = new Texture2D(img.width + bxOffset, img.height + byOffset);
+
+            Color[] fillDefault = new Color[tempImg.width * tempImg.height];
+            Color[] sliceDefault = new Color[(blockXSize + bxOffset) * (blockYSize + byOffset)];
+
+            for (int i = 0; i < fillDefault.Length; i++) {
+                fillDefault[i] = Color.black;
+
+                if (i < sliceDefault.Length) sliceDefault[i] = Color.black;
+            }
+
+            tempImg.SetPixels(fillDefault);
+            tempImg.SetPixels(bxOffset / 2, byOffset / 2, img.width, img.height, img.GetPixels());
+            tempImg.Apply();
+            AssetDatabase.CreateAsset(tempImg, "Assets/Piece/Offset.asset");
             Texture2D[] slices = new Texture2D[xAmount * yAmount];
 
             int index = 0;
+
             for (int i = 0; i < yAmount; i++) {
                 for (int j = 0; j < xAmount; j++) {
-                    Texture2D temp = new Texture2D(blockXSize, blockYSize);
-                    temp.SetPixels(fillDefault);
+                    Texture2D temp = new Texture2D(blockXSize + bxOffset, blockYSize + byOffset);
 
-                    float offset = 0.3f;
-
-                    if (j<1) {
-                        int xSize = (int)(blockXSize * (1f - offset));
-                        int ySize = (int)(blockYSize * (1f - offset));
-
-                        //Need to figure out the uv offsset overlap to make the slices fit with pieces
-
-                        temp.SetPixels(img.GetPixels(img.width - (j + 1) * blockXSize, blockYSize * i, blockXSize, blockYSize));
-                    } else {
-                        temp.SetPixels(img.GetPixels(img.width - (j + 1) * blockXSize, blockYSize * i, blockXSize, blockYSize));
-                    }
-                        temp.Apply();
+                    temp.SetPixels(tempImg.GetPixels(j * blockXSize, img.height -  (i+1) * blockYSize, blockXSize + bxOffset, blockYSize + byOffset));
+                    temp.Apply();
 
                     slices[index] = temp;
                     index++;
