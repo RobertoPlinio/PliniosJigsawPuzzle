@@ -1294,7 +1294,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   debug: 0
   debug_image: {fileID: 2800000, guid: 6bcb529188bfa214d86975ac29e7cbdf, type: 3}
-  debug_fillImage: 1
+  debug_adjustmentMode: 0
   debug_createNewImgAsset: 0
 --- !u!1 &670263629
 GameObject:
@@ -2273,7 +2273,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridDimensions: {x: 8, y: 5}
   imgHandler: {fileID: 862140175}
-  testImage: {fileID: 2800000, guid: f87b883ea7d96744d83cc888e15c3e3e, type: 3}
+  testImage: {fileID: 2800000, guid: 2a46c1fc1a3f83d409ab2a88065c0e32, type: 3}
   gridPieces: []
   scale: 1
 --- !u!114 &862140175
@@ -2290,8 +2290,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   debug: 0
   debug_image: {fileID: 0}
-  debug_fillImage: 0
-  debug_createNewImgAsset: 0
+  debug_adjustmentMode: 0
+  debug_createNewImgAsset: 1
 --- !u!1 &927357993
 GameObject:
   m_ObjectHideFlags: 0

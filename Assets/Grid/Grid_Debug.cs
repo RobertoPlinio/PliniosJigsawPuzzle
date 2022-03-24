@@ -20,6 +20,11 @@ namespace JigsawPuzzle
         }
 
         private void Start() {
+            DoFullProcedure();
+        }
+
+        [ContextMenu("Do full procedure")]
+        public void DoFullProcedure() {
             adjustedImage = imgHandler.AdjustImageToBounds(testImage);
             Texture2D[] slices = imgHandler.SliceImage(adjustedImage, 0.5f);
 

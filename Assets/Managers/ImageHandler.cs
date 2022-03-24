@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -7,10 +8,12 @@ namespace JigsawPuzzle
 {
     public class ImageHandler : MonoBehaviour
     {
+        public enum AdjustmentMode { Stretch, Crop, Fill };
+
         [Header("Debug options")]
         public bool debug = false;
         public Texture2D debug_image;
-        public bool debug_fillImage = true;
+        public AdjustmentMode debug_adjustmentMode = AdjustmentMode.Stretch;
         public bool debug_createNewImgAsset = false;
 
         int xAmount, yAmount;
@@ -22,9 +25,9 @@ namespace JigsawPuzzle
         }
 
         [ContextMenu("Prepare Image")]
-        public void Debug_PrepareImg() => AdjustImageToBounds(debug_image, debug_fillImage);
+        public void Debug_PrepareImg() => AdjustImageToBounds(debug_image, debug_adjustmentMode);
 
-        public Texture2D AdjustImageToBounds(Texture2D image, bool fillImg = false) {
+        public Texture2D AdjustImageToBounds(Texture2D image, AdjustmentMode adjustMode = AdjustmentMode.Stretch) {
             Texture2D finalImage;
 
             int pDiv = GetGCD(xAmount, yAmount);
@@ -40,44 +43,35 @@ namespace JigsawPuzzle
             int fillW = image.width;
             int fillH = image.height;
 
-            if (!equalAxis) {
-                if (xIsBigger) {
-                    if (debug_fillImage) {
-                        fillW = (int)(image.width * pRatio);
-                        print($"[x] Image needs filling on horizontal by {(fillW - image.width) / 2} each side");
-                    } else {
-                        pRatio = (float)yAmount / xAmount;
-                        fillH = (int)(image.height * pRatio);
-                        print($"[x] Image will be cropped on vertical by {(image.width - fillH) / 2} each side");
-                    }
-                } else {
-                    if (debug_fillImage) {
-                        pRatio = (float)yAmount / xAmount;
-                        fillH = (int)(image.height * pRatio);
-                        print($"[y] Image needs filling on vertical by {(fillH - image.height) / 2} each side");
-                    } else {
-                        fillW = (int)(image.width * pRatio);
-                        print($"[y] Image will be cropped on horizontal by {(image.width - fillW) / 2} each side");
-                    }
-                }
-
-                int fiDiv = GetGCD(fillW, fillH);
-                float fiRatio = (float)fillW / fillH;
-                print($"Image size will be: {fillW},{fillH} with ratio {fillW / fiDiv}:{fillH / fiDiv} or {fiRatio}");
-                finalImage = fillImg ? FillImage(image, fillW, fillH, xIsBigger) : CropImage(image, fillW, fillH, !xIsBigger);
-
-                if (debug_createNewImgAsset) {
-                    AssetDatabase.CreateAsset(finalImage, "Assets/Piece/Result.asset");
-                }
-
-            } else {
+            if (equalAxis) {
                 print("Image fits perfectly");
                 finalImage = image;
+            } else {
+                switch (adjustMode) {
+                    default:
+                        print("Stretching image");
+                        finalImage = new Texture2D(image.width, image.height);
+                        finalImage.SetPixels(image.GetPixels());
+                        finalImage.Apply();
+                        break;
+                    case AdjustmentMode.Crop:
+                        print("Cropping image");
+                        finalImage = CropImage(image, iRatio, pRatio);
+                        break;
+                    case AdjustmentMode.Fill:
+                        print("Filling image");
+                        finalImage = FillImage(image, iRatio, pRatio);
+                        break;
+                }
             }
 
             pieceXsize = finalImage.width / xAmount;
             pieceYsize = finalImage.height / yAmount;
             print($"Piece size: {pieceXsize}x{pieceYsize}");
+
+            if (debug_createNewImgAsset && !equalAxis) {
+                AssetDatabase.CreateAsset(finalImage, "Assets/Piece/Result.asset");
+            }
 
             return finalImage;
         }
@@ -111,7 +105,7 @@ namespace JigsawPuzzle
                 for (int j = 0; j < xAmount; j++) {
                     Texture2D temp = new Texture2D(blockXSize + bxOffset, blockYSize + byOffset);
 
-                    temp.SetPixels(tempImg.GetPixels(j * blockXSize, img.height -  (i+1) * blockYSize, blockXSize + bxOffset, blockYSize + byOffset));
+                    temp.SetPixels(tempImg.GetPixels(j * blockXSize, img.height - (i + 1) * blockYSize, blockXSize + bxOffset, blockYSize + byOffset));
                     temp.Apply();
 
                     slices[index] = temp;
@@ -122,46 +116,61 @@ namespace JigsawPuzzle
             return slices;
         }
 
-        Texture2D FillImage(Texture2D original, int newWidth, int newHeight, bool fillOnX) {
-            Color[] fillDefault = new Color[newWidth * newHeight];
-            for (int i = 0; i < fillDefault.Length; i++) fillDefault[i] = Color.black;
+        Texture2D CropImage(Texture2D originalImg, float originalRatio, float targetRatio) {
+            int newSize;
+            Texture2D returnImg;
 
-            Texture2D tempImg = new Texture2D(newWidth, newHeight);
-            tempImg.SetPixels(fillDefault);
-
-            if (fillOnX) {
-                print($"Filling at x: {(newWidth - original.width) / 2}");
-                tempImg.SetPixels((newWidth - original.width) / 2, 0, original.width, original.height, original.GetPixels());
+            if (originalRatio > targetRatio) {
+                newSize = (int)(originalImg.height * targetRatio);
+                returnImg = new Texture2D(newSize, originalImg.height);
+                returnImg.SetPixels(originalImg.GetPixels((originalImg.width - newSize) / 2, 0, newSize, originalImg.height));
             } else {
-                print($"Filling at y: {(newHeight - original.height) / 2}");
-                tempImg.SetPixels(0, (newHeight - original.height) / 2, original.width, original.height, original.GetPixels());
+                newSize = (int)(originalImg.width / targetRatio);
+                returnImg = new Texture2D(originalImg.width, newSize);
+                returnImg.SetPixels(originalImg.GetPixels(0, (originalImg.height - newSize) / 2, originalImg.width, newSize));
             }
 
-            tempImg.Apply();
-            return tempImg;
+            returnImg.Apply();
+            return returnImg;
         }
 
-        Texture2D CropImage(Texture2D original, int newWidth, int newHeight, bool cropOnX) {
-            Texture2D tempImg = new Texture2D(newWidth, newHeight);
+        Texture2D FillImage(Texture2D originalImg, float originalRatio, float targetRatio) {
+            int newSize, fillOffset;
+            Texture2D returnImg;
 
-            if (cropOnX) {
-                int wDiff = original.width - newWidth;
-                tempImg.SetPixels(0, 0, newWidth, newHeight, original.GetPixels(wDiff / 2, 0, newWidth, newHeight));
-                print($"Cropping image at x: {wDiff / 2}");
+            if (originalRatio > targetRatio) {
+                newSize = (int)(originalImg.width / targetRatio);
+                fillOffset = newSize - originalImg.height;
+                returnImg = new Texture2D(originalImg.width, newSize);
+                SetDefaultFill(ref returnImg);
+                returnImg.SetPixels(0, fillOffset / 2, originalImg.width, originalImg.height, originalImg.GetPixels());
             } else {
-                int hDiff = original.height - newHeight;
-                tempImg.SetPixels(0, 0, newWidth, newHeight, original.GetPixels(0, hDiff / 2, newWidth, newHeight));
-                print($"Cropping image at y: {hDiff / 2}");
+                newSize = (int)(originalImg.height * targetRatio);
+                fillOffset = newSize - originalImg.width;
+                returnImg = new Texture2D(newSize, originalImg.height);
+                SetDefaultFill(ref returnImg);
+                returnImg.SetPixels(fillOffset / 2, 0, originalImg.width, originalImg.height, originalImg.GetPixels());
             }
 
-            tempImg.Apply();
-            return tempImg;
+            returnImg.Apply();
+            return returnImg;
+
+            void SetDefaultFill(ref Texture2D img) {
+                Color[] colorArray = new Color[img.width * img.height];
+
+                for (int i = 0; i < colorArray.Length; i++) {
+                    colorArray[i] = Color.black;
+                }
+
+                img.SetPixels(colorArray);
+                img.Apply();
+            }
         }
 
         int GetGCD(int a, int b) {
             while (a != b) {
-                if (a < b) b = b - a;
-                else a = a - b;
+                if (a < b) b -= a;
+                else a -= b;
             }
 
             return a;
