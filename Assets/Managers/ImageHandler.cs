@@ -97,7 +97,9 @@ namespace JigsawPuzzle
             tempImg.SetPixels(fillDefault);
             tempImg.SetPixels(bxOffset / 2, byOffset / 2, img.width, img.height, img.GetPixels());
             tempImg.Apply();
-            AssetDatabase.CreateAsset(tempImg, "Assets/Piece/Offset.asset");
+            
+            //AssetDatabase.CreateAsset(tempImg, "Assets/Piece/Offset.asset");
+            
             Texture2D[] slices = new Texture2D[xAmount * yAmount];
 
             int index = 0;
