@@ -1165,7 +1165,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &442180094
 Transform:
   m_ObjectHideFlags: 0
@@ -1195,7 +1195,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   grid: {fileID: 0}
-  imgSlicer: {fileID: 0}
+  imgHandler: {fileID: 0}
+  debug: 1
+  debug_width: 5
+  debug_height: 8
+  debug_pieceSize: 1
+  debug_image: {fileID: 2800000, guid: f87b883ea7d96744d83cc888e15c3e3e, type: 3}
+  debug_adjustmentMode: 2
 --- !u!1 &527271215
 GameObject:
   m_ObjectHideFlags: 0
@@ -1239,16 +1245,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a27ecb263fec0674fa74159a2d1412c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showDebug: 0
-  debug_width: 8
-  debug_height: 5
-  debug_pieceSize: 1
   matArray1:
   - {fileID: -876546973899608171, guid: 968b84b85eeb1f34bbef3794b41374d8, type: 3}
   - {fileID: 1673722310792516149, guid: 968b84b85eeb1f34bbef3794b41374d8, type: 3}
   matArray2:
   - {fileID: 1673722310792516149, guid: 968b84b85eeb1f34bbef3794b41374d8, type: 3}
   - {fileID: -876546973899608171, guid: 968b84b85eeb1f34bbef3794b41374d8, type: 3}
+  showDebug: 0
+  debug_width: 8
+  debug_height: 5
+  debug_pieceSize: 1
 --- !u!1 &611907081
 GameObject:
   m_ObjectHideFlags: 0
@@ -2204,7 +2210,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &862140173
 Transform:
   m_ObjectHideFlags: 0

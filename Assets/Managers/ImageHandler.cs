@@ -1,3 +1,4 @@
+using MyBox;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -12,9 +13,9 @@ namespace JigsawPuzzle
 
         [Header("Debug options")]
         public bool debug = false;
-        public Texture2D debug_image;
-        public AdjustmentMode debug_adjustmentMode = AdjustmentMode.Stretch;
-        public bool debug_createNewImgAsset = false;
+        [ConditionalField(nameof(debug))]  public Texture2D debug_image;
+        [ConditionalField(nameof(debug))] public AdjustmentMode debug_adjustmentMode = AdjustmentMode.Stretch;
+        [ConditionalField(nameof(debug))] public bool debug_createNewImgAsset = false;
 
         int xAmount, yAmount;
         int pieceXsize, pieceYsize;

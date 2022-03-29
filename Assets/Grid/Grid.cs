@@ -3,16 +3,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using MyBox;
 
 namespace JigsawPuzzle
 {
     public class Grid : MonoBehaviour
     {
+        [Header("Overriden if Puzzle Manager is present")]
+        public Material[] matArray1;
+        public Material[] matArray2;
+        
         [Header("Debug options")]
         public bool showDebug = false;
+
+        [ConditionalField(nameof(showDebug))]
         [Range(2, 50)] public int debug_width, debug_height;
+
+        [ConditionalField(nameof(showDebug))]
         [Range(0.1f, 1)] public float debug_pieceSize = 1f;
-        public Material[] matArray1, matArray2;
+
         int debug_totalPieces => debug_height * debug_width;
 
         public GridSlot[,] slots;
