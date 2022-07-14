@@ -53,7 +53,6 @@ namespace JigsawPuzzle
             for (int c = 0; c < cols; c++) {
                 for (int r = 0; r < rows; r++) {
                     string name = CreatePieceName(r, c);
-                    Debug.Log($"Piece name is {name}");
                     GameObject piece = Instantiate(prefabs.First(x => x.name.Contains(name)) as GameObject, slots[r, c].position, Quaternion.identity);
                     Piece pieceComponent = piece.GetComponent<Piece>();
                     piece.GetComponent<MeshRenderer>().materials = mats; //Just temp fun visualization

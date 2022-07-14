@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using MyBox;
 using UnityEditor;
-using MyBox.Internal;
 
 namespace JigsawPuzzle
 {
@@ -61,6 +60,18 @@ namespace JigsawPuzzle
 
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireCube(transform.TransformPoint(new Vector2(debug_width * 0.5f, debug_height * -0.5f)), new Vector2(debug_width, debug_height));
+        }
+
+        [ButtonMethod]
+        public void ResetTabletop()
+        {
+            foreach(var piece in piecesInPlay)
+            {
+                Destroy(piece.gameObject);
+            }
+
+            piecesInPlay.Clear();
+            Start();
         }
     }
 }
