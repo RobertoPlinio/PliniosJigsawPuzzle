@@ -11,6 +11,7 @@ namespace JigsawPuzzle
         public Grid grid;
         public ImageHandler imgHandler;
 
+        [Range(0.1f, 1)] public float pieceSlotDistanceTolerance = 0.4f;
         HashSet<Piece> piecesInPlay = new HashSet<Piece>();
 
         [Header("Debug")]
@@ -23,15 +24,18 @@ namespace JigsawPuzzle
         [ConditionalField(nameof(debug))] public Texture2D debug_image;
         [ConditionalField(nameof(debug))] public ImageHandler.AdjustmentMode debug_adjustmentMode = ImageHandler.AdjustmentMode.Stretch;
 
-        private void Awake() {
+        private void Awake()
+        {
             grid = GetComponentInChildren<Grid>();
             imgHandler = GetComponentInChildren<ImageHandler>();
         }
 
-        private void Start() {
+        private void Start()
+        {
             Texture2D adjustedImage = default;
 
-            if (debug) {
+            if (debug)
+            {
                 InitDebug(ref adjustedImage);
             }
 
@@ -41,7 +45,8 @@ namespace JigsawPuzzle
             MeshRenderer mr;
             int count = 0;
 
-            foreach(var piece in piecesInPlay) {
+            foreach (var piece in piecesInPlay)
+            {
                 mr = piece.GetComponent<MeshRenderer>();
                 mr.material.SetColor("_Color", Color.white);
                 mr.material.mainTexture = slices[count++];
@@ -49,13 +54,35 @@ namespace JigsawPuzzle
             }
         }
 
-        private void InitDebug(ref Texture2D img) {
+        public void OnPieceUpdatedPosition(Piece piece)
+        {
+            if (!grid.GetGridSlot(piece, out Grid.GridSlot gridSlot))
+            {
+                if (debug) Debug.Log($"[PUZZLE] Could not find slot for piece {piece.name}");
+                return;
+            }
+
+            float pieceSlotDistance = (piece.transform.position - gridSlot.position).magnitude;
+            bool isPieceInSlot = pieceSlotDistance <= pieceSlotDistanceTolerance;
+
+            if (debug)
+            {
+                if (isPieceInSlot) Debug.Log($"[PUZZLE]<color=green> Piece {piece.name} is in correct slot!</color>");
+                else Debug.Log($"[PUZZLE]<color=red> Piece {piece.name} is NOT in correct slot!</color>");
+            }
+        }
+
+        #region Debug
+
+        private void InitDebug(ref Texture2D img)
+        {
             grid.Init(debug_width, debug_height, debug_pieceSize);
             imgHandler.Init(debug_width, debug_height);
             img = imgHandler.AdjustImageToBounds(debug_image, debug_adjustmentMode);
         }
 
-        private void OnDrawGizmos() {
+        private void OnDrawGizmos()
+        {
             if (!debug || Application.isPlaying) return;
 
             Gizmos.color = Color.yellow;
@@ -65,7 +92,7 @@ namespace JigsawPuzzle
         [ButtonMethod]
         public void ResetTabletop()
         {
-            foreach(var piece in piecesInPlay)
+            foreach (var piece in piecesInPlay)
             {
                 Destroy(piece.gameObject);
             }
@@ -73,5 +100,7 @@ namespace JigsawPuzzle
             piecesInPlay.Clear();
             Start();
         }
+
+        #endregion
     }
 }
