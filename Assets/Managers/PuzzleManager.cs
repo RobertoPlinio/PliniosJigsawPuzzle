@@ -68,7 +68,7 @@ namespace JigsawPuzzle
             if (debug)
             {
                 if (isPieceInSlot) Debug.Log($"[PUZZLE]<color=green> Piece {piece.name} is in correct slot!</color>");
-                else Debug.Log($"[PUZZLE]<color=red> Piece {piece.name} is NOT in correct slot!</color>");
+                else Debug.Log($"[PUZZLE]<color=red> Piece {piece.name} is NOT in correct slot!</color> {pieceSlotDistance}");
             }
         }
 
