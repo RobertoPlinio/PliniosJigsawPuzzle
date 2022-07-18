@@ -9,6 +9,9 @@ namespace JigsawPuzzle
 {
     public class Grid : MonoBehaviour
     {
+        public int gridWidth, gridHeight;
+        public float slotSize;
+
         [Header("Overriden if Puzzle Manager is present")]
         public Material[] matArray1;
         public Material[] matArray2;
@@ -43,12 +46,18 @@ namespace JigsawPuzzle
 
         public void Init(int width, int height, float pieceSize = 1f)
         {
-            GenerateGridSlots(width, height, pieceSize);
+            gridWidth = width;
+            gridHeight = height;
+            slotSize = pieceSize;
+            GenerateGridSlots(gridWidth, gridHeight, slotSize);
         }
 
-        public HashSet<Piece> GeneratePieces(PuzzleManager manager)
+        // Y is negative because the grid starts at Y = 0 and then goes downwards
+        public Vector2 GetGridDimensions() => new Vector2(gridWidth * slotSize, -gridHeight * slotSize);
+
+        public List<Piece> GeneratePieces(PuzzleManager manager)
         {
-            HashSet<Piece> createdPieces = new HashSet<Piece>();
+            List<Piece> createdPieces = new List<Piece>();
             int rows = slots.GetLength(0);
             int cols = slots.GetLength(1);
 

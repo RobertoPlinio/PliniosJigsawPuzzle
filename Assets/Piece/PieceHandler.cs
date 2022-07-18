@@ -37,7 +37,7 @@ namespace JigsawPuzzle
             if (!_piece) return;
 
             Vector3 piecePos = cameraDir.origin + cameraDir.direction * 10;
-            piecePos.z = 0;
+            
             _piece.transform.position = piecePos;
 
         }

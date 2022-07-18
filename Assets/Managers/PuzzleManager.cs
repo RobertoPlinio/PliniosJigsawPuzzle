@@ -12,7 +12,7 @@ namespace JigsawPuzzle
         public ImageHandler imgHandler;
 
         [Range(0.1f, 1)] public float pieceSlotDistanceTolerance = 0.4f;
-        HashSet<Piece> piecesInPlay = new HashSet<Piece>();
+        List<Piece> piecesInPlay = new List<Piece>();
 
         [Header("Debug")]
         public bool debug = false;
@@ -52,6 +52,11 @@ namespace JigsawPuzzle
                 mr.material.mainTexture = slices[count++];
                 //mr.material.mainTextureScale = Vector2.one * scale;
             }
+
+            Vector3 gridDimensions = grid.GetGridDimensions();
+            gridDimensions.z = piecesInPlay[0].transform.position.z;
+
+            CameraController.Instance.UpdateCameraPos(gridDimensions * 0.5f, piecesInPlay[0].transform.position);
         }
 
         public void OnPieceUpdatedPosition(Piece piece)
