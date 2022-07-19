@@ -11,6 +11,10 @@ namespace JigsawPuzzle
         public Grid grid;
         public ImageHandler imgHandler;
 
+        private int gridWidth, gridHeight;
+        private Texture2D originalImage;
+        private ImageHandler.AdjustmentMode adjustmentMode = ImageHandler.AdjustmentMode.Stretch;
+        private float pieceSize = 1f;
         [Range(0.1f, 1)] public float pieceSlotDistanceTolerance = 0.4f;
         List<Piece> piecesInPlay = new List<Piece>();
 
@@ -32,12 +36,11 @@ namespace JigsawPuzzle
 
         private void Start()
         {
-            Texture2D adjustedImage = default;
+            if (debug) InitDebug();
 
-            if (debug)
-            {
-                InitDebug(ref adjustedImage);
-            }
+            grid.Init(gridWidth, gridHeight, pieceSize);
+            imgHandler.Init(gridWidth, gridHeight);
+            Texture2D adjustedImage = imgHandler.AdjustImageToBounds(originalImage, adjustmentMode);
 
             piecesInPlay = grid.GeneratePieces(this);
             Texture2D[] slices = imgHandler.SliceImage(adjustedImage, 0.5f);
@@ -77,13 +80,17 @@ namespace JigsawPuzzle
             }
         }
 
+        public float GetPieceSize() => pieceSize;
+
         #region Debug
 
-        private void InitDebug(ref Texture2D img)
+        private void InitDebug()
         {
-            grid.Init(debug_width, debug_height, debug_pieceSize);
-            imgHandler.Init(debug_width, debug_height);
-            img = imgHandler.AdjustImageToBounds(debug_image, debug_adjustmentMode);
+            gridWidth = debug_width;
+            gridHeight = debug_height;
+            pieceSize = debug_pieceSize;
+            originalImage = debug_image;
+            adjustmentMode = debug_adjustmentMode;
         }
 
         private void OnDrawGizmos()

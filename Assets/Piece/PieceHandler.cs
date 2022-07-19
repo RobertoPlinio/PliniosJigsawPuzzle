@@ -38,8 +38,7 @@ namespace JigsawPuzzle
 
             Vector3 piecePos = cameraDir.origin + cameraDir.direction * 10;
             
-            _piece.transform.position = piecePos;
-
+            _piece.MoveToWithSizeOffset(piecePos);
         }
 
         private void OnReleased()

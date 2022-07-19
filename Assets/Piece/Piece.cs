@@ -25,6 +25,15 @@ namespace JigsawPuzzle
         public bool IsCorner;
 
         private PuzzleManager _manager;
+        private float _pieceSize = -1f;
+
+        public float PieceSize
+        {
+            get {
+                if (_pieceSize < 0f) _pieceSize = _manager.GetPieceSize();
+                return _pieceSize; 
+            }
+        }
 
         private string pieceName
         {
@@ -37,7 +46,22 @@ namespace JigsawPuzzle
             UpdatePiece();
         }
 
-        public void InjectManager(PuzzleManager newManager) => _manager = newManager;
+        public void InjectManager(PuzzleManager newManager)
+        {
+            _manager = newManager;
+            _pieceSize = _manager.GetPieceSize();
+        }
+
+        public void MoveTo(Vector3 worldPos)
+        {
+            transform.position = worldPos;
+        }
+
+        public void MoveToWithSizeOffset(Vector3 worldPos)
+        {
+            Vector3 offset = new Vector3(-1, 1) * PieceSize * 0.5f;
+            MoveTo(worldPos + offset);
+        }
 
         public void UpdatePiece()
         {
