@@ -15,13 +15,12 @@ namespace JigsawPuzzle.Input
         public override bool GetReleased()
         {
             return UnityEngine.Input.GetMouseButtonUp(0);
+        }
 
-            //if (_justReleased)
-            //{
-            //    _justReleased = false;
-            //    return true;
-            //}
-            //else return false;
+        public override bool GetZooming(out float zoomMagnitude)
+        {
+            zoomMagnitude = UnityEngine.Input.mouseScrollDelta.y;
+            return zoomMagnitude != 0f;
         }
     }
 }

@@ -9,6 +9,7 @@ namespace JigsawPuzzle.Input
     {
         public static Action<Vector3> OnPressed;
         public static Action<Vector3> OnHold;
+        public static Action<float> OnZoom;
         public static Action OnReleased;
 
         public bool _previousHolding;
@@ -56,6 +57,11 @@ namespace JigsawPuzzle.Input
                     OnReleased?.Invoke();
 
                 _previousHolding = false;
+            }
+
+            if(_currentModule.GetZooming(out float _zoomMagnitude))
+            {
+                OnZoom?.Invoke(_zoomMagnitude);
             }
         }
     }

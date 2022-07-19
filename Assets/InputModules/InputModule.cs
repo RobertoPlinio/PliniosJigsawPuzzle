@@ -9,5 +9,6 @@ namespace JigsawPuzzle.Input
         public PuzzleInputManager _manager;
         public abstract bool GetHolding(out Vector3 pixelCoordinates);
         public abstract bool GetReleased();
+        public abstract bool GetZooming(out float zoomMagnitude);
     }
 }

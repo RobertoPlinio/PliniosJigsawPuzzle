@@ -2680,8 +2680,9 @@ MonoBehaviour:
   mainCamera: {fileID: 0}
   cameraDistance: 10
   zoomLevel:
-    Min: 0.5
-    Max: 2
+    Min: 0.1
+    Max: 1.4953709
+  zoomSpeed: 1
 --- !u!1 &1061121799
 GameObject:
   m_ObjectHideFlags: 0
