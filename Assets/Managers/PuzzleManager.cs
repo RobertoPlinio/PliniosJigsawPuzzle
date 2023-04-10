@@ -1,8 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MyBox;
-using UnityEditor;
 
 namespace JigsawPuzzle
 {
@@ -53,7 +51,6 @@ namespace JigsawPuzzle
                 mr = piece.GetComponent<MeshRenderer>();
                 mr.material.SetColor("_Color", Color.white);
                 mr.material.mainTexture = slices[count++];
-                //mr.material.mainTextureScale = Vector2.one * scale;
             }
 
             Vector3 gridDimensions = grid.GetGridDimensions();
@@ -72,6 +69,11 @@ namespace JigsawPuzzle
 
             float pieceSlotDistance = (piece.transform.position - gridSlot.position).magnitude;
             bool isPieceInSlot = pieceSlotDistance <= pieceSlotDistanceTolerance;
+
+            if (isPieceInSlot)
+            {
+                piece.SlotPiece(gridSlot.position);
+            }
 
             if (debug)
             {

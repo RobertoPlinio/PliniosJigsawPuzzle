@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,8 +6,8 @@ namespace JigsawPuzzle
 {
     public class Piece : MonoBehaviour
     {
-        const string pieceResourcesPath = "Piece/Pieces";
-        const string piecePresetResourcesPath = "Piece/Presets";
+        public const string pieceResourcesPath = "Piece/Pieces";
+        public const string piecePresetResourcesPath = "Piece/Presets";
         public enum Side
         {
             Edge,
@@ -62,6 +60,23 @@ namespace JigsawPuzzle
             Vector3 offset = new Vector3(-1, 1) * PieceSize * 0.5f;
             MoveTo(worldPos + offset);
         }
+
+        public void SlotPiece(Vector3 slotPos)
+        {
+            MoveTo(slotPos);
+            GetComponent<Collider>().enabled = false;
+        }
+
+        [MyBox.ButtonMethod]
+        public void UpdatePiecePosition()
+        {
+            _manager.OnPieceUpdatedPosition(this);
+        }
+
+        #region PieceAssetHandling
+
+        [MyBox.ButtonMethod(0)]
+        private void UpdateAsset() => UpdatePiece();
 
         public void UpdatePiece()
         {
@@ -126,13 +141,6 @@ namespace JigsawPuzzle
             }
         }
 
-        [MyBox.ButtonMethod]
-        public void UpdatePiecePosition()
-        {
-            _manager.OnPieceUpdatedPosition(this);
-        }
-
-        [MyBox.ButtonMethod(0)]
-        private void UpdateAsset() => UpdatePiece();
+        #endregion
     }
 }
