@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Manager = JigsawPuzzle.Input.PuzzleInputManager;
 
@@ -9,6 +7,8 @@ namespace JigsawPuzzle
     {
         public Camera mainCamera;
         private Piece _piece;
+
+        private float _pieceZ;
 
         private void OnEnable()
         {
@@ -27,17 +27,18 @@ namespace JigsawPuzzle
             if (!Physics.Raycast(cameraDir, out RaycastHit hitInfo, 20f)) return;
 
             _piece = hitInfo.collider.GetComponent<Piece>();
+            _pieceZ = _piece.transform.position.z;
         }
 
         private void OnHolding(Vector3 pixelPos)
         {
-            Ray cameraDir = mainCamera.ScreenPointToRay(pixelPos);
-            Debug.DrawRay(cameraDir.origin, cameraDir.direction * 20f);
-
             if (!_piece) return;
 
+            Ray cameraDir = mainCamera.ScreenPointToRay(pixelPos);
+
             Vector3 piecePos = cameraDir.origin + cameraDir.direction * 10;
-            
+            piecePos.z = _pieceZ;
+
             _piece.MoveToWithSizeOffset(piecePos);
         }
 

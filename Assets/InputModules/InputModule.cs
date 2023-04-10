@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace JigsawPuzzle.Input
@@ -10,5 +8,7 @@ namespace JigsawPuzzle.Input
         public abstract bool GetHolding(out Vector3 pixelCoordinates);
         public abstract bool GetReleased();
         public abstract bool GetZooming(out float zoomMagnitude);
+
+        //TO DO: Paning
     }
 }
