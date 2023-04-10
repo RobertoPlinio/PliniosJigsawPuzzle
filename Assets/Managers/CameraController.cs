@@ -13,7 +13,7 @@ namespace JigsawPuzzle
         public Camera mainCamera;
         public float cameraDistance = 10f;
         [MinMaxRange(0.1f, 3f)]
-        public RangedFloat zoomLevel = new RangedFloat(0.1f, 1.5f);
+        public RangedFloat zoomRange = new RangedFloat(0.1f, 1.5f);
         public float zoomSpeed = 1f;
 
         private float _defaultCameraFOV, minFOV, maxFOV;
@@ -52,8 +52,8 @@ namespace JigsawPuzzle
 
             mainCamera.transform.position = cameraPos;
             _defaultCameraFOV = FOV_degrees;
-            minFOV = _defaultCameraFOV * zoomLevel.Min;
-            maxFOV = _defaultCameraFOV * zoomLevel.Max;
+            minFOV = _defaultCameraFOV * zoomRange.Min;
+            maxFOV = _defaultCameraFOV * zoomRange.Max;
             SetCameraFOV(FOV_degrees);
         }
 
@@ -67,6 +67,7 @@ namespace JigsawPuzzle
 
         private void Update()
         {
+            //TO DO: Remove these move commands when normal paning is implemented
             float upInput = UnityEngine.Input.GetKey(KeyCode.W) ? 1f : 0f;
             float downInput = UnityEngine.Input.GetKey(KeyCode.S) ? 1f : 0f;
             float leftInput = UnityEngine.Input.GetKey(KeyCode.A) ? 1f : 0f;

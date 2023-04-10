@@ -61,7 +61,7 @@ namespace JigsawPuzzle
             int rows = slots.GetLength(0);
             int cols = slots.GetLength(1);
 
-            Object[] prefabs = Resources.LoadAll("Piece/Presets");
+            Object[] prefabs = Resources.LoadAll(Piece.piecePresetResourcesPath);
             Material[] mats = matArray1;
 
             for (int c = 0; c < cols; c++)
